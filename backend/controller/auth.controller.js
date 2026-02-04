@@ -1,9 +1,12 @@
 import User from "../models/user.model.js";
 import gentoken from "../utils/token.js";
+import bcrypt from "bcryptjs";
+
 
 export const signUp = async (req, res) => {
+  console.log(req.body);
   try {
-    const { fullName, email, password, mobile, role } = req.body;
+    let { fullName, email, password, mobile, role } = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
@@ -76,7 +79,7 @@ export const signIn = async (req, res) => {
 
 export const signOut = async (req, res) => {
   try {
-    res.clearcookie("token");
+    res.clearCookie("token");
     return res.status(200).json({ message: "log out successfully" });
   } catch (error) {
     return res.status(500).json(`sign out error ${error}`);
