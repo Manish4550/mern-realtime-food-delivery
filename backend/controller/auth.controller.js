@@ -6,8 +6,8 @@ import bcrypt from "bcryptjs";
 export const signUp = async (req, res) => {
   console.log(req.body);
   try {
-    let { fullName, email, password, mobile, role } = req.body;
-    const user = await User.findOne({ email });
+    const { fullName, email, password, mobile, role } = req.body;
+    let user = await User.findOne({ email });
 
     if (user) {
       return res.status(400).json({ message: "User Already Exist." });
