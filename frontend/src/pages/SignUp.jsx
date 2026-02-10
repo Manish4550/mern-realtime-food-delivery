@@ -1,11 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 
 import { FcGoogle } from "react-icons/fc";
 
 import { useState } from "react";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
 
 const SignUp = () => {
   const primaryColor = "#ff4d2d";
@@ -23,19 +25,47 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     try {
-      const response = await axios.post(`${serverUrl}/api/auth/signup`, {
-        fullName,
-        email,
-        password,
-        mobile,
-        role,
-      },{withCredentials:true});
+      const response = await axios.post(
+        `${serverUrl}/api/auth/signup`,
+        {
+          fullName,
+          email,
+          password,
+          mobile,
+          role,
+        },
+        { withCredentials: true },
+      );
 
       console.log(response);
-      
+      navigate("/signin");
     } catch (error) {
       console.log(error);
-      
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    if (!mobile) {
+      return alert("mobile no is required");
+    }
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    try {
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        {
+          fullName: result.user.displayName,
+          email: result.user.email,
+          role,
+          mobile,
+        },
+        { withCredentials: true },
+      );
+      console.log(data);
+
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -74,11 +104,10 @@ const SignUp = () => {
             className="w-full border rounded-lg px-3 py-2"
             placeholder="Enter Your Full Name"
             style={{ border: `1px solid ${borderColor}` }}
-             value={fullName}
+            value={fullName}
             onChange={(e) => {
               setfullName(e.target.value);
             }}
-           
           />
         </div>
 
@@ -96,7 +125,7 @@ const SignUp = () => {
             className="w-full border rounded-lg px-3 py-2"
             placeholder="Enter Your Email"
             style={{ border: `1px solid ${borderColor}` }}
-             value={email}
+            value={email}
             onChange={(e) => {
               setemail(e.target.value);
             }}
@@ -117,8 +146,7 @@ const SignUp = () => {
             className="w-full border rounded-lg px-3 py-2"
             placeholder="Enter Your Mobile Number"
             style={{ border: `1px solid ${borderColor}` }}
-                        value={mobile}
-
+            value={mobile}
             onChange={(e) => {
               setmobile(e.target.value);
             }}
@@ -139,8 +167,7 @@ const SignUp = () => {
             className="w-full border rounded-lg px-3 py-2"
             placeholder="Enter Your Password"
             style={{ border: `1px solid ${borderColor}` }}
-                        value={password}
-
+            value={password}
             onChange={(e) => {
               setpassword(e.target.value);
             }}
@@ -159,7 +186,8 @@ const SignUp = () => {
           <div className=" flex gap-2">
             {["user", "owner", "deliveryBoy"].map((r) => (
               <button
-                className=" cursor-pointer flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors" key={r}
+                className=" cursor-pointer flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors"
+                key={r}
                 onClick={() => setrole(r)}
                 style={
                   role == r
@@ -177,12 +205,16 @@ const SignUp = () => {
         </div>
 
         <button
-          className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`} onClick={handleSignUp}
+          className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
+          onClick={handleSignUp}
         >
           Sign Up
         </button>
 
-        <button className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-200 hover:bg-gray-100">
+        <button
+          className=" w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-200 hover:bg-gray-100"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span> Sign up with Google </span>
         </button>

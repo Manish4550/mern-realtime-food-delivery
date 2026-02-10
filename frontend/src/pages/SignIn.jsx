@@ -6,6 +6,8 @@ import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
 
 const SignIn = () => {
   const primaryColor = "#ff4d2d";
@@ -17,21 +19,40 @@ const SignIn = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
 
-
   const handleSignIn = async () => {
     try {
-      const response = await axios.post(`${serverUrl}/api/auth/signin`, {
-  
-        email,
-        password,
-       
-      },{withCredentials:true});
+      const response = await axios.post(
+        `${serverUrl}/api/auth/signin`,
+        {
+          email,
+          password,
+        },
+        { withCredentials: true },
+      );
 
       console.log(response);
-      
+      navigate("/");
     } catch (error) {
       console.log(error);
-      
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    try {
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        {
+          fullName: result.user.displayName,
+          email: result.user.email,
+        },
+        { withCredentials: true },
+      );
+      console.log(data);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -56,8 +77,6 @@ const SignIn = () => {
           Sign In to your account to get started with delicious food deliveries
         </p>
 
-    
-
         {/*Email*/}
 
         <div className="mb-4">
@@ -72,13 +91,12 @@ const SignIn = () => {
             className="w-full border rounded-lg px-3 py-2"
             placeholder="Enter Your Email"
             style={{ border: `1px solid ${borderColor}` }}
-             value={email}
+            value={email}
             onChange={(e) => {
               setemail(e.target.value);
             }}
           />
         </div>
-
 
         {/* Password*/}
 
@@ -94,26 +112,31 @@ const SignIn = () => {
             className="w-full border rounded-lg px-3 py-2"
             placeholder="Enter Your Password"
             style={{ border: `1px solid ${borderColor}` }}
-                        value={password}
-
+            value={password}
             onChange={(e) => {
               setpassword(e.target.value);
             }}
           />
         </div>
 
-
-        <div className="text-right mb-4 text-[#ff4d2d] cursor-pointer" onClick={()=>navigate("/forgot-password")}>
+        <div
+          className="text-right mb-4 text-[#ff4d2d] cursor-pointer"
+          onClick={() => navigate("/forgot-password")}
+        >
           Forgot Password
         </div>
 
         <button
-          className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`} onClick={handleSignIn}
+          className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
+          onClick={handleSignIn}
         >
           Sign In
         </button>
 
-        <button className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-200 hover:bg-gray-100">
+        <button
+          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-200 hover:bg-gray-100"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span> Sign In with Google </span>
         </button>
@@ -121,7 +144,7 @@ const SignIn = () => {
         <button className="w-full">
           <p
             className="text-center mt-2 cursor-pointer"
-            onClick={() => navigate("/signin")}
+            onClick={() => navigate("/signup")}
           >
             {" "}
             Want to create a new account ?{" "}
