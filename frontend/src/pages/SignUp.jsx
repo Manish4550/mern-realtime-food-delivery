@@ -1,5 +1,5 @@
 import React from "react";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { FcGoogle } from "react-icons/fc";
 
@@ -8,11 +8,10 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
+import { ClipLoader } from "react-spinners"
 
 const SignUp = () => {
   const primaryColor = "#ff4d2d";
-  const hoverColor = "#e64323";
-  const bgColor = "#fff9f6";
   const borderColor = "#ddd";
 
   const navigate = useNavigate();
@@ -22,8 +21,12 @@ const SignUp = () => {
   const [password, setpassword] = useState("");
   const [mobile, setmobile] = useState("");
   const [role, setrole] = useState("user");
+  const [err, seterr] = useState()
+  const [loading, setloading] = useState(false)
+
 
   const handleSignUp = async () => {
+    setloading(true)
     try {
       const response = await axios.post(
         `${serverUrl}/api/auth/signup`,
@@ -39,14 +42,17 @@ const SignUp = () => {
 
       console.log(response);
       navigate("/signin");
+      seterr("")
+      setloading(false)
     } catch (error) {
-      console.log(error);
+      seterr(error.response?.data?.message)
+      setloading(false)
     }
   };
 
   const handleGoogleAuth = async () => {
     if (!mobile) {
-      return alert("mobile no is required");
+      return seterr("Mobile no is  required")
     }
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
@@ -63,7 +69,6 @@ const SignUp = () => {
         { withCredentials: true },
       );
       console.log(data);
-
     } catch (error) {
       console.log(error);
     }
@@ -108,6 +113,7 @@ const SignUp = () => {
             onChange={(e) => {
               setfullName(e.target.value);
             }}
+            required
           />
         </div>
 
@@ -129,6 +135,7 @@ const SignUp = () => {
             onChange={(e) => {
               setemail(e.target.value);
             }}
+            required
           />
         </div>
 
@@ -149,7 +156,7 @@ const SignUp = () => {
             value={mobile}
             onChange={(e) => {
               setmobile(e.target.value);
-            }}
+            }} required
           />
         </div>
 
@@ -170,7 +177,7 @@ const SignUp = () => {
             value={password}
             onChange={(e) => {
               setpassword(e.target.value);
-            }}
+            }} required
           />
         </div>
 
@@ -206,10 +213,13 @@ const SignUp = () => {
 
         <button
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
-          onClick={handleSignUp}
+          onClick={handleSignUp} disabled={loading}
         >
-          Sign Up
+          {loading?<ClipLoader size={20} color="white"/>:"Sign Up"}
+          
         </button>
+        {err && <p className='text-red-700 text-center my-2.5'>*{err}</p>}
+        
 
         <button
           className=" w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-200 hover:bg-gray-100"

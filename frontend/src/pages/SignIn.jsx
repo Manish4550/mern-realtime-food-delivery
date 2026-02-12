@@ -8,6 +8,8 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
+import { ClipLoader } from "react-spinners"
+
 
 const SignIn = () => {
   const primaryColor = "#ff4d2d";
@@ -18,8 +20,11 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [err, seterr] = useState();
+  const [loading, setloading] = useState(false);
 
   const handleSignIn = async () => {
+    setloading(true);
     try {
       const response = await axios.post(
         `${serverUrl}/api/auth/signin`,
@@ -32,8 +37,11 @@ const SignIn = () => {
 
       console.log(response);
       navigate("/");
+      seterr("");
+      setloading(false);
     } catch (error) {
-      console.log(error);
+      seterr(error.response?.data?.message);
+      setloading(false);
     }
   };
 
@@ -95,6 +103,7 @@ const SignIn = () => {
             onChange={(e) => {
               setemail(e.target.value);
             }}
+            required
           />
         </div>
 
@@ -116,7 +125,8 @@ const SignIn = () => {
             onChange={(e) => {
               setpassword(e.target.value);
             }}
-          />
+          />{" "}
+          required
         </div>
 
         <div
@@ -128,10 +138,11 @@ const SignIn = () => {
 
         <button
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
-          onClick={handleSignIn}
+          onClick={handleSignIn} disabled={loading}
         >
-          Sign In
+          {loading ? <ClipLoader size={20} color="white" /> : "Sign In"}{" "}
         </button>
+        {err && <p className="text-red-700 text-center my-2.5">*{err}</p>}
 
         <button
           className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-200 hover:bg-gray-100"

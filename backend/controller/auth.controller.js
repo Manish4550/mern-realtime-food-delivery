@@ -92,8 +92,8 @@ export const sendOtp = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "User does not exist." });
-    }
+  return res.status(200).json({ message: "If account exists, OTP sent." });
+}
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     user.resetOtp = otp;
@@ -142,15 +142,23 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-export const GoogleAuth = async (req,res) => {
+export const GoogleAuth = async (req, res) => {
   try {
-    const {fullName,email,mobile,role}=req.body
-    let user= await User.findOne({email})
-    if(!user){
-      user=await User.create({
-        fullName,email,mobile,role
-      })
-        const token = await gentoken(user._id);
+    const { fullName, email } = req.body;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        fullName,
+        email,
+        mobile: "0000000000", // dummy mobile (or make mobile not required)
+        role: "user", // default role
+      });
+    }
+
+    const token = await gentoken(user._id);
+
     res.cookie("token", token, {
       secure: false,
       sameSite: "strict",
@@ -159,8 +167,9 @@ export const GoogleAuth = async (req,res) => {
     });
 
     return res.status(200).json(user);
-    }
+
   } catch (error) {
-     return res.status(500).json(`GoogleAuth error ${error}`);
+    console.log(error); // IMPORTANT
+    return res.status(500).json(`GoogleAuth error ${error}`);
   }
-}
+};
