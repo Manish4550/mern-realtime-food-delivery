@@ -3,10 +3,12 @@ import { Route, Routes } from 'react-router-dom'
 import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import ForgotPassword from './pages/ForgotPassword'
+import useGetCurrentuser from './hooks/useGetCurrentuser'
 
 export const serverUrl="http://localhost:8000"
 
 const App = () => {
+  useGetCurrentuser()
   return (
     <Routes>
        <Route path="/" element={<SignUp />} />

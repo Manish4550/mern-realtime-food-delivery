@@ -17,7 +17,7 @@ const ForgotPassword = () => {
   const [loading, setloading] = useState(false);
 
   const handleSendOtp = async () => {
-    loading(true);
+    setloading(true);
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/send-otp`,
@@ -27,15 +27,15 @@ const ForgotPassword = () => {
       console.log(result);
       setStep(2);
       seterr("");
-      loading(false);
+      setloading(false);
     } catch (error) {
       seterr(error.response?.data?.message);
-      loading(false);
+      setloading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    loading(true);
+    setloading(true);
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/verify-otp`,
@@ -46,15 +46,15 @@ const ForgotPassword = () => {
       console.log(result);
       setStep(3);
       seterr("");
-      loading(false);
+      setloading(false);
     } catch (error) {
       seterr(error.response?.data?.message);
-      loading(false);
+      setloading(false);
     }
   };
 
   const handleResetPassword = async () => {
-    loading(true);
+    setloading(true);
     if (newPassword != confromPassword) {
       return null;
     }
@@ -68,10 +68,10 @@ const ForgotPassword = () => {
       console.log(result);
       navigate("/signin");
       seterr("");
-      loading(false);
+      setloading(false);
     } catch (error) {
       seterr(error.response?.data?.message);
-      loading(false);
+      setloading(false);
     }
   };
 
