@@ -4,9 +4,9 @@
 
 ### MERN Stack (Google Auth + Razorpay)
 
-A **100% practical, real-world MERN Stack project** built with modern technologies and production-level architecture.
+A production-ready Food Delivery Application built with the MERN stack featuring real-time order tracking (Google Maps + Socket.io), Google One Tap authentication, and Razorpay payment integration.
 
-This project simulates a complete multi-role food delivery platform including **User, Restaurant Owner, and Delivery Partner panels** with realtime tracking and secure payments.
+Implements secure JWT-based authentication, password reset via Email OTP, role-based dashboards (User, Owner, Delivery), and a complete cart, checkout, and order management system.
 
 ---
 
@@ -171,5 +171,6 @@ Full Stack MERN Developer
 Building scalable, production-ready web applications.
 
 ---
+
 
 
